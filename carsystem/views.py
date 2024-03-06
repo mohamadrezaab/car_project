@@ -2,7 +2,9 @@ from django.shortcuts import render
 from rest_framework import generics
 from rest_framework.generics import ListAPIView
 from .models import Car, Person, Fine
-from django.db.models import Count
+from django.contrib.gis.db.models.functions import Distance
+from django.contrib.gis.geos import Point
+from django.contrib.gis.measure import Distance 
 from .serializers import CarSerializer, PersonSerializer, FineSerializer
 from rest_framework.permissions import IsAuthenticated
 
@@ -43,9 +45,21 @@ class ElderlyOwnersCarsListAPIView(generics.ListAPIView):
 
 class LocationLightCars(generics.ListAPIView):
     serializer_class = FineSerializer
-    queryset=Fine.objects.all()
     
+    def get_queryset(self):
+        # Define target locations
+        target_location = Point(51.388187, 35.689197, srid=4326)  # Toll coordinates 1
+        distance_threshold = Distance(m=600)
 
+        # Filtering fines based on the locations
+        queryset = Fine.objects.filter(
+            location__distance_lte=(target_location, distance_threshold),
+            car__is_heavy=False  
+        )
+        return queryset
+
+
+    
 class OwnersWithTrafficViolationListAPIView(generics.ListAPIView):
     serializer_class = PersonSerializer
    
