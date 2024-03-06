@@ -4,6 +4,7 @@ from rest_framework.generics import ListAPIView
 from .models import Car, Person, Fine
 from django.contrib.gis.db.models.functions import Distance
 from django.contrib.gis.geos import Point
+from django.db.models import Count
 from django.contrib.gis.measure import Distance 
 from .serializers import CarSerializer, PersonSerializer, FineSerializer
 from rest_framework.permissions import IsAuthenticated
